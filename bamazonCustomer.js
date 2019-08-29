@@ -116,21 +116,18 @@ function userQuantity() {
     connection.query('SELECT * FROM products', function (err, res) {
         inquirer.prompt([
             {
-                type: 'list',
+                type: 'input',
                 name: 'quantity',
-                choices: ['1','2','3'],
                 message: 'How many would you like to purchase?'
             }
         ]).then(function (answer) {
-            console.log(answer)
             var chosenProduct = productChosen;
             var chosenQuantity = answer.quantity;
             connection.query('SELECT * FROM products WHERE item_id=?', [chosenProduct], function(err, res){
                 if (err) throw err;
-                console.log(res[0])
-                if (chosenProduct > res[0].stock_quantity){
-                    console.log('Out of stock, sorry for the inconvenience')
-                    connection.end();
+                if (chosenQuantity > res[0].stock_quantity){
+                    console.log('\nOut of stock, sorry for the inconvenience\n')
+                    userPrompt()
                 } else {
                     var updatedStock = res[0].stock_quantity - chosenQuantity;
                     query = 'UPDATE products SET ? WHERE ?';
@@ -146,7 +143,7 @@ function userQuantity() {
                     var totalCost = chosenQuantity * res[0].price;
                     var totalCostOwed = totalCost.toFixed(2);
 
-                    console.log('\nOrder successful!\nYour total cost is ' + totalCostOwed + '\nThanks for shopping with Bamazon!\n')
+                    console.log('\nOrder successful!\nYour total cost is $' + totalCostOwed + '\nThanks for shopping with Bamazon!\n')
 
                 }
             })
