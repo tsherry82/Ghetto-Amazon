@@ -16,5 +16,11 @@ today I will be working on the prompt to get the user input when select the item
 
 I also switched up the price int to be a decimal so I could give the products more realistic values, and also changed the item_id numbers as well to make it more authentic then having an auto incremented number
 
+============================ 8/27 ===============================
+
+going to start syncing the users purchases with the database so it will deduct after purchases and then update database
+
+ended up switching the item id back to the auto increment because it was adding unnecessary work to my plate
+
 
 

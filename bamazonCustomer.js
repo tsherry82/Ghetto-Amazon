@@ -18,16 +18,18 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log('Welcome to Bamazon!, Take a look at what we are offering today! \n')
+    console.log('\nWelcome to Bamazon!, Take a look at what we are offering today! \n')
     displayStock();
-    connection.end();
+
 
 });
+var productChosen = null;
+
 function displayStock() {
-    connection.query('SELECT item_id, product_name, department_name, price FROM products', function (err, res) {
+    connection.query('SELECT * FROM products', function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            console.log("ID: " + res[i].item_id + "\n", "Name: " + res[i].product_name + "\n", "Department: " + res[i].department_name + "\n", "Price: " + res[i].price + "\n");
+            console.log("ID: " + res[i].item_id + "\n", "Name: " + res[i].product_name + "\n", "Department: " + res[i].department_name + "\n", "Price: " + res[i].price + "\n", 'Stock: ' + res[i].stock_quantity + '\n');
         }
         userPrompt();
     })
@@ -42,6 +44,7 @@ function userPrompt() {
             message: 'Please input the item ID number that you are interested in purchasing'
         }
     ]).then(function (userRes) {
+        productChosen = userRes.product
         switch (userRes.product) {
             case '1':
                 console.log('\nThank you for your selection\nYou have chosen the Khaleesi Wig!\n');
@@ -120,13 +123,33 @@ function userQuantity() {
             }
         ]).then(function (answer) {
             console.log(answer)
-            var chosenProduct = [];
-            for( var i = 0; i < res.length;i++){
-                if(res[i].item_id === parseInt(answer.quantity)) {
-                    chosenProduct = res[i].item_id;
-                }
+            var chosenProduct = productChosen;
+            var chosenQuantity = answer.quantity;
+            connection.query('SELECT * FROM products WHERE item_id=?', [chosenProduct], function(err, res){
+                if (err) throw err;
+                console.log(res[0])
+                if (chosenProduct > res[0].stock_quantity){
+                    console.log('Out of stock, sorry for the inconvenience')
+                    connection.end();
+                } else {
+                    var updatedStock = res[0].stock_quantity - chosenQuantity;
+                    query = 'UPDATE products SET ? WHERE ?';
+                    connection.query('SELECT * FROM products WHERE item_id=?',
+                    [
+                        {stock_quantity : updatedStock},
+                        {item_id: chosenProduct}
+                    ],
+                    function(err, res) {
+                        if (err) throw err;
+                        connection.end();
+                    });
+                    var totalCost = chosenQuantity * res[0].price;
+                    var totalCostOwed = totalCost.toFixed(2);
 
-            }
+                    console.log('\nOrder successful!\nYour total cost is ' + totalCostOwed + '\nThanks for shopping with Bamazon!\n')
+
+                }
+            })
            
         })
     })
