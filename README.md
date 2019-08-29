@@ -23,4 +23,7 @@ going to start syncing the users purchases with the database so it will deduct a
 ended up switching the item id back to the auto increment because it was adding unnecessary work to my plate
 
 
+link to video: 
+https://drive.google.com/file/d/1oD2eZKv4fINbb2HwavOLpiQgHKQqzBlf/view?usp=sharing
+
 
